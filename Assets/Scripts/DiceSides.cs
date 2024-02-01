@@ -8,7 +8,7 @@ public class DiceSide
 {
     public Vector3 Center;
     public Vector3 Normal;
-    public TextMeshProUGUI textMesh;
+    public TextMeshProUGUI TextMesh;
     public int Value;
 
     public DiceSide(Vector3 Center, Vector3 Normal)
@@ -19,29 +19,27 @@ public class DiceSide
 }
 public class DiceSides : MonoBehaviour
 {
-    [SerializeField] public DiceSide[] Sides = new DiceSide[0];
+    [HideInInspector] public DiceSide[] sides = new DiceSide[0];
     public GameObject textPrefab;
-
-
-    public DiceSide GetDiceSide(int index) => Sides[index];
 
     public Quaternion GetWorldRotationFor(int index)
     {
-        Vector3 worldNormalToMatch = transform.TransformDirection(GetDiceSide(index).Normal);
+        Vector3 worldNormalToMatch = transform.TransformDirection(sides[index].Normal);
         return Quaternion.FromToRotation(worldNormalToMatch, Vector3.up) * transform.rotation;
     }
-    public int GetMatch()
+    /// <summary>
+    /// Return upper number of the dice
+    /// </summary>
+    public int GetResult()
     {
-        int sideCount = Sides.Length;
-
         Vector3 localVectorToMatch = transform.InverseTransformDirection(Vector3.up);
 
         DiceSide closestSide = null;
         float closestDot = -1f;
 
-        for (int i = 0; i < sideCount; i++)
+        for (int i = 0; i < sides.Length; i++)
         {
-            DiceSide side = Sides[i];
+            DiceSide side = sides[i];
             float dot = Vector3.Dot(side.Normal, localVectorToMatch);
 
             if (closestSide == null || dot > closestDot)
@@ -61,10 +59,10 @@ public class DiceSides : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        for (int i = 0; i < Sides.Length; i++)
+        for (int i = 0; i < sides.Length; i++)
         {
-            Gizmos.DrawSphere(transform.rotation * Sides[i].Center + transform.position, 0.1f);
-            Gizmos.DrawRay(transform.rotation * Sides[i].Center + transform.position, transform.rotation * Sides[i].Normal );
+            Gizmos.DrawSphere(transform.rotation * sides[i].Center + transform.position, 0.1f);
+            Gizmos.DrawRay(transform.rotation * sides[i].Center + transform.position, transform.rotation * sides[i].Normal );
         }
     }
 }

@@ -12,7 +12,7 @@ public class DiceSideEditor : Editor
 
     void OnEnable()
     {
-        diceSides = serializedObject.FindProperty("Sides");
+        diceSides = serializedObject.FindProperty("sides");
     }
 
     public override void OnInspectorGUI()
@@ -64,20 +64,25 @@ public class DiceSideEditor : Editor
     {
 
         DiceSides sides = target as DiceSides;
-        sides.Sides[index].textMesh.gameObject.SetActive(false);
-        sides.Sides[index].textMesh.text = sides.Sides[index].Value.ToString();
-        sides.Sides[index].textMesh.gameObject.SetActive(true);
+        sides.sides[index].TextMesh.gameObject.SetActive(false);
+        sides.sides[index].TextMesh.text = sides.sides[index].Value.ToString();
+        sides.sides[index].TextMesh.gameObject.SetActive(true);
         sides.transform.rotation = sides.GetWorldRotationFor(index);
         SceneView.RepaintAll();
     }
 
+
+
+    /// <summary>
+    /// Calculates sides of the target mesh, adds texts to canvas, removes old ones
+    /// </summary>
     void CalculateSides()
     {
         DiceSides sides = target as DiceSides;
         Mesh mesh = GetMesh(sides);
 
         List<DiceSide> foundSides = FindDiceSides(mesh, sides);
-        sides.Sides = new DiceSide[foundSides.Count];
+        sides.sides = new DiceSide[foundSides.Count];
         serializedObject.Update();
 
         for (int i = 0; i < foundSides.Count; i++)
@@ -86,16 +91,19 @@ public class DiceSideEditor : Editor
             SerializedProperty sideProperty = diceSides.GetArrayElementAtIndex(i);
             sideProperty.FindPropertyRelative("Center").vector3Value = side.Center;
             sideProperty.FindPropertyRelative("Normal").vector3Value = side.Normal;
-            sideProperty.FindPropertyRelative("textMesh").objectReferenceValue = side.textMesh;
+            sideProperty.FindPropertyRelative("TextMesh").objectReferenceValue = side.TextMesh;
             sideProperty.FindPropertyRelative("Value").intValue = side.Value;
 
-            side.textMesh.gameObject.SetActive(false);
-            side.textMesh.text = side.Value.ToString();
-            side.textMesh.gameObject.SetActive(true);
+            side.TextMesh.gameObject.SetActive(false);
+            side.TextMesh.text = side.Value.ToString();
+            side.TextMesh.gameObject.SetActive(true);
         }
 
         serializedObject.ApplyModifiedProperties();
     }
+    /// <summary>
+    ///Checks all the tris of the mesh, groups them, and finds center/normal
+    /// </summary>
 
     List<DiceSide> FindDiceSides(Mesh mesh, DiceSides diceSides)
     {
@@ -109,7 +117,7 @@ public class DiceSideEditor : Editor
         {
             Vector3 a = vertices[triangles[i]];
             Vector3 b = vertices[triangles[i + 1]];
-            Vector3 c = vertices[triangles[i + 2]] ;
+            Vector3 c = vertices[triangles[i + 2]];
 
             allTris.Add(new DiceSide((a + b + c) / 3f, Vector3.Cross(b - a, c - a).normalized));
         }
@@ -138,19 +146,24 @@ public class DiceSideEditor : Editor
         for (int i = canvas.transform.childCount; i > 0; --i)
             DestroyImmediate(canvas.transform.GetChild(0).gameObject);
 
+
+
+        return AddTexts(diceSides, canvas, result);
+    }
+
+    private List<DiceSide> AddTexts(DiceSides diceSides, Canvas canvas, List<DiceSide> result)
+    {
         for (int i = 0; i < result.Count; i++)
         {
             GameObject textObj = Instantiate(diceSides.textPrefab, canvas.transform);
             textObj.transform.position = diceSides.transform.rotation * (result[i].Center + result[i].Normal * Consts.diceTextsOffset) + diceSides.transform.position;
             textObj.transform.forward = diceSides.transform.rotation * (-result[i].Normal);
 
-            result[i].textMesh = textObj.GetComponent<TextMeshProUGUI>();
+            result[i].TextMesh = textObj.GetComponent<TextMeshProUGUI>();
             result[i].Value = i + 1;
         }
-
         return result;
     }
-
 
     Mesh GetMesh(DiceSides sides)
     {

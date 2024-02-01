@@ -20,6 +20,7 @@ public class DiceRoller : MonoBehaviour, IDraggable
     public Action<int> OnRollOver;
     [SerializeField] float speedLimit = 1000f;
 
+    //Automatic Roll
     public async void PerformRoll()
     {
         if (!rollStarted)
@@ -39,21 +40,33 @@ public class DiceRoller : MonoBehaviour, IDraggable
         {
             if (rb.velocity == Vector3.zero && rb.angularVelocity == Vector3.zero)
             {
-                Debug.Log(diceSides.GetMatch());
-                OnRollOver?.Invoke(diceSides.GetMatch());
+                Debug.Log(diceSides.GetResult());
+                OnRollOver?.Invoke(diceSides.GetResult());
                 rollStarted = false;
             }
         }
+        if(transform.position.y <= -10f)
+        {
+            RespawnDice(); //Just in case the Dice will leave the box
+        }
+    }
+
+    private void RespawnDice()
+    {
+        transform.position = Vector3.zero;
     }
 
     public void OnDrag()
     {
+        //It's not used, yet, but it'll become handy if there will be somthing else to drag
     }
 
     public void OnDrop()
     {
+        rb.mass = 1f;
         if (rb.velocity.sqrMagnitude + rb.angularVelocity.sqrMagnitude >= speedLimit)
         {
+         
             rollStarted = true;
         }
         else
@@ -66,8 +79,10 @@ public class DiceRoller : MonoBehaviour, IDraggable
 
     public void OnStartDrag()
     {
+        rb.mass = 10f;
     }
 
+    
     public bool CanBeDragged()
     {
         return !rollStarted;
