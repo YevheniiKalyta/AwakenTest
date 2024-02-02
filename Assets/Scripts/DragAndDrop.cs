@@ -10,7 +10,6 @@ public class DragAndDrop : MonoBehaviour
     [SerializeField] Rigidbody hookRb;
     [SerializeField] float floorOffset;
 
-
     private void Update()
     {
 
@@ -44,6 +43,10 @@ public class DragAndDrop : MonoBehaviour
                 Vector3 positionToMoveTo = raycastHit.point - (raycastHit.point - Camera.main.transform.position).normalized * floorOffset;
                 hookRb.MovePosition(positionToMoveTo);
 
+            }
+            else
+            {
+                hookRb.MovePosition(hook.connectedBody.position);
             }
             objectToDrag.OnDrag();
         }

@@ -40,7 +40,6 @@ public class DiceRoller : MonoBehaviour, IDraggable
         {
             if (rb.velocity == Vector3.zero && rb.angularVelocity == Vector3.zero)
             {
-                Debug.Log(diceSides.GetResult());
                 OnRollOver?.Invoke(diceSides.GetResult());
                 rollStarted = false;
             }
@@ -66,14 +65,18 @@ public class DiceRoller : MonoBehaviour, IDraggable
         rb.mass = 1f;
         if (rb.velocity.sqrMagnitude + rb.angularVelocity.sqrMagnitude >= speedLimit)
         {
-         
+            Debug.Log(rb.velocity.sqrMagnitude + rb.angularVelocity.sqrMagnitude);
             rollStarted = true;
         }
         else
         {
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            transform.position = RaycastManager.PerformRaycastAtMousePos(Consts.tableLayerMask).point;
+            Vector3 leavePoint = RaycastManager.PerformRaycastAtMousePos(Consts.tableLayerMask).point;
+            if(leavePoint!= Vector3.zero)
+            {
+                transform.position = leavePoint;
+            }
         }
     }
 

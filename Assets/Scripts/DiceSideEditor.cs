@@ -5,6 +5,7 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(DiceSides))]
 public class DiceSideEditor : Editor
 {
@@ -179,3 +180,4 @@ public class DiceSideEditor : Editor
         }
     }
 }
+#endif
