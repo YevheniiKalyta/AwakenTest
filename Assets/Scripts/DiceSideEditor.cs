@@ -39,13 +39,13 @@ public class DiceSideEditor : Editor
         {
             for (int i = 0; i < diceSides.arraySize; i++)
             {
-                ShowDiceSideUI(i);
+                SetTextUI(i);
             }
         }
         EditorGUI.indentLevel--;
     }
 
-    void ShowDiceSideUI(int index)
+    void SetTextUI(int index)
     {
         SerializedProperty side = diceSides.GetArrayElementAtIndex(index);
         SerializedProperty value = side.FindPropertyRelative("Value");

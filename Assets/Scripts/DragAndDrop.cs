@@ -12,7 +12,6 @@ public class DragAndDrop : MonoBehaviour
 
     private void Update()
     {
-
         if (Input.GetMouseButtonDown(0))
         {
             Collider raycastCollider = RaycastManager.PerformRaycastAtMousePos(Consts.grabbableLayerMask).collider;

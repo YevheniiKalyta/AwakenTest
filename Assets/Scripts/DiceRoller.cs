@@ -13,14 +13,15 @@ public class DiceRoller : MonoBehaviour, IDraggable
     [SerializeField] float rollForceMin;
     [Range(15, 150)]
     [SerializeField] float rollForceMax;
-
-
     [SerializeField] DiceSides diceSides;
+    [SerializeField] float speedLimit = 1000f;
+    private const float underTheBoxY = -10f;
     bool rollStarted;
     public Action<int> OnRollOver;
-    [SerializeField] float speedLimit = 1000f;
 
-    //Automatic Roll
+    /// <summary>
+    /// Performs automatic roll
+    /// </summary>
     public async void PerformRoll()
     {
         if (!rollStarted)
@@ -44,7 +45,7 @@ public class DiceRoller : MonoBehaviour, IDraggable
                 rollStarted = false;
             }
         }
-        if(transform.position.y <= -10f)
+        if(transform.position.y <= underTheBoxY)
         {
             RespawnDice(); //Just in case the Dice will leave the box
         }
@@ -57,7 +58,7 @@ public class DiceRoller : MonoBehaviour, IDraggable
 
     public void OnDrag()
     {
-        //It's not used, yet, but it'll become handy if there will be somthing else to drag
+        //It's not used, yet, but it'll become handy if there will be something else to drag
     }
 
     public void OnDrop()

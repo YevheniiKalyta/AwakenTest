@@ -22,6 +22,9 @@ public class DiceSides : MonoBehaviour
     [HideInInspector] public DiceSide[] sides = new DiceSide[0];
     public GameObject textPrefab;
 
+    /// <summary>
+    /// Helper to rotate the dice
+    /// </summary>
     public Quaternion GetWorldRotationFor(int index)
     {
         Vector3 worldNormalToMatch = transform.TransformDirection(sides[index].Normal);
