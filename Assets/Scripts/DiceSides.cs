@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Analytics;
+
 [System.Serializable]
 public class DiceSide
 {
@@ -17,10 +17,12 @@ public class DiceSide
         this.Normal = Normal;
     }
 }
+
 public class DiceSides : MonoBehaviour
 {
-    [HideInInspector] public DiceSide[] sides = new DiceSide[0];
+    [HideInInspector] public DiceSide[] sides;
     public GameObject textPrefab;
+    public DiceSide highlightedSide { get; private set; }
 
     /// <summary>
     /// Helper to rotate the dice
@@ -53,11 +55,21 @@ public class DiceSides : MonoBehaviour
 
             if (dot > Consts.matchValue)
             {
+                StartCoroutine(HighlightNumber(side));
                 return side.Value;
             }
         }
 
         return closestSide?.Value ?? -1;
+    }
+
+    private IEnumerator HighlightNumber(DiceSide diceSide)
+    {
+        highlightedSide = diceSide;
+        diceSide.TextMesh.color = Color.yellow;
+        yield return new WaitForSecondsRealtime(2f);
+        diceSide.TextMesh.color = Color.white;
+        highlightedSide = null;
     }
 
     private void OnDrawGizmos()
@@ -67,5 +79,11 @@ public class DiceSides : MonoBehaviour
             Gizmos.DrawSphere(transform.rotation * sides[i].Center + transform.position, 0.1f);
             Gizmos.DrawRay(transform.rotation * sides[i].Center + transform.position, transform.rotation * sides[i].Normal );
         }
+    }
+
+    internal void TurnOffHighlight()
+    {
+        StopAllCoroutines();
+        highlightedSide.TextMesh.color = Color.white;
     }
 }

@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 public class DiceRoller : MonoBehaviour, IDraggable
 {
     [SerializeField] Rigidbody rb;
-    [Range(15,150)]
+    [Range(15, 150)]
     [SerializeField] float rollForceMin;
     [Range(15, 150)]
     [SerializeField] float rollForceMax;
@@ -26,9 +26,10 @@ public class DiceRoller : MonoBehaviour, IDraggable
     {
         if (!rollStarted)
         {
-            Vector3 targetPostition = new Vector3(Random.Range(-1f, 1f), Random.Range(0f, 1f), Random.Range(-1f, 1f));
+            CheckHighlight();
+            SoundManager.Instance.PlaySFXOneShotVarPitch("throw");
+            Vector3 targetPostition = new Vector3(Random.Range(-1f, 1f), transform.position.y, Random.Range(-1f, 1f));
             Vector3 direction = (targetPostition - transform.position).normalized;
-            direction.y = 0f;
             rb.AddForce(direction * Random.Range(rollForceMin, rollForceMax), ForceMode.Impulse);
             await Task.Delay(500);
             rollStarted = true;
@@ -42,10 +43,11 @@ public class DiceRoller : MonoBehaviour, IDraggable
             if (rb.velocity == Vector3.zero && rb.angularVelocity == Vector3.zero)
             {
                 OnRollOver?.Invoke(diceSides.GetResult());
+                SoundManager.Instance.PlaySFXOneShotVarPitch("result",false);
                 rollStarted = false;
             }
         }
-        if(transform.position.y <= underTheBoxY)
+        if (transform.position.y <= underTheBoxY)
         {
             RespawnDice(); //Just in case the Dice will leave the box
         }
@@ -63,10 +65,11 @@ public class DiceRoller : MonoBehaviour, IDraggable
 
     public void OnDrop()
     {
+
         rb.mass = 1f;
         if (rb.velocity.sqrMagnitude + rb.angularVelocity.sqrMagnitude >= speedLimit)
         {
-            Debug.Log(rb.velocity.sqrMagnitude + rb.angularVelocity.sqrMagnitude);
+            SoundManager.Instance.PlaySFXOneShotVarPitch("throw");
             rollStarted = true;
         }
         else
@@ -74,7 +77,7 @@ public class DiceRoller : MonoBehaviour, IDraggable
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             Vector3 leavePoint = RaycastManager.PerformRaycastAtMousePos(Consts.tableLayerMask).point;
-            if(leavePoint!= Vector3.zero)
+            if (leavePoint != Vector3.zero)
             {
                 transform.position = leavePoint;
             }
@@ -84,11 +87,27 @@ public class DiceRoller : MonoBehaviour, IDraggable
     public void OnStartDrag()
     {
         rb.mass = 10f;
+        CheckHighlight();
+    }
+    /// <summary>
+    /// Checks if side is highlighted and turns it off
+    /// </summary>
+    private void CheckHighlight()
+    {
+        if (diceSides.highlightedSide != null)
+        {
+            diceSides.TurnOffHighlight();
+        }
     }
 
-    
     public bool CanBeDragged()
     {
         return !rollStarted;
+    }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        SoundManager.Instance.PlaySFXOneShotVarPitch("dice");
     }
 }
